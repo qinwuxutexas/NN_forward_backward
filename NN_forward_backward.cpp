@@ -22,7 +22,7 @@ typedef vector<float> v1f;
 class math_operations {
 public:
     v2f activation_wrapper(string mode, v2f& Z, int row, int col) { //compute A = activateion_function (Z))
-        vector <vector <float>> A(row, vector<float>(col, 0));
+        v2f A(row, vector<float>(col, 0));
         if (mode == "relu")
             relu(Z, row, col, A);
         else if (mode == "sigmoid")
@@ -64,16 +64,17 @@ public:
         }
     }
 
-    float multiply_element_wise(float* A, float* B, const int row, const int col) {
-        //float* AT = new float[row * col];
+    pair <*float, float> multiply_element_wise(float* A, float* B, const int row, const int col) {
+        float* AB = new float[row * col];
         float val = 0;
         // #pragma omp parallel for
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
-                val += (*(A + i * row + j)) * (*(B + i * row + j));
+                *(AB + i * row + j) = (*(A + i * row + j)) * (*(B + i * row + j));
+                val += *(AB + i * row + j);
             }
         }
-        return val;
+        return make_pair (AB, val);
     }
 
     float* multiply_dot(float* A, float* B, const int row, const int col, const int col2) {
