@@ -11,12 +11,8 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
-#include <iostream>
-#include <string>
 #include <fstream>
-#include <vector>
 #include <sstream>
-#include <unordered_map>
 #include<string.h>
 
 using namespace std;
