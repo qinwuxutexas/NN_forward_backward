@@ -22,7 +22,7 @@ typedef vector<float> v1f;
 class math_operations {
 public:
     v2f activation_wrapper(string mode, v2f& Z, int row, int col) { //compute A = activateion_function (Z))
-        v2f A(row, vector<float>(col, 0));
+        v2f A(row, v1f (col, 0));
         if (mode == "relu")
             relu(Z, row, col, A);
         else if (mode == "sigmoid")
