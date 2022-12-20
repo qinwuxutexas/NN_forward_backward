@@ -52,7 +52,7 @@ public:
         return AT;
     }
 
-    v2f matrix_minus(v2f A, v2f B) {
+    v2f matrix_minus(v2f & A, v2f & B) {
         int row = A.size(), col = A[0].size();
         v2f AT(row, v1f(col, 0));
         // #pragma omp parallel for
@@ -103,7 +103,7 @@ public:
         }
     }
 
-    float sums(v2f A) {
+    float sums(v2f & A) {
         int row = A.size(), col = A[0].size();
         float value = 0;
         // #pragma omp parallel for
@@ -115,7 +115,7 @@ public:
         return value;
     }
 
-    v1f sums(v2f A, int axis) {
+    v1f sums(v2f  &  A, int axis) {
         int row = A.size(), col = A[0].size();
         int size1 = axis > 0 ? row : col;
         vector<float> value(size1, 0);
@@ -145,7 +145,7 @@ public:
         return value;
     }
 
-    float mean(v2f A) {
+    float mean(v2f & A) {
         int row = A.size(), col = A[0].size();
         float value = 0;
         // #pragma omp parallel for
