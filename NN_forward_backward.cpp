@@ -64,7 +64,7 @@ public:
         }
     }
 
-    pair <*float, float> multiply_element_wise(float* A, float* B, const int row, const int col) {
+    pair <float*, float> multiply_element_wise(float* A, float* B, const int row, const int col) {
         float* AB = new float[row * col];
         float val = 0;
         // #pragma omp parallel for
