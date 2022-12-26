@@ -1,10 +1,9 @@
 // An (aritificial, or deep) neural network with forward and backward computations, in C++
 // Q. Xu,  Date: December 18, 2022
-// v 0.0
 
 // Notes:
 // 1) this is a quick prototype version 0.0.
-// 2) low level calculation (e.g., loops) is used witout using HPC method or libraries.
+// 2) low level calculation is used witout using library, and thus high performance computing methods are warrnted per users' facility, e.g., for cpus with Open MP (examples provided) or message passing.
 
 #include <iostream>
 #include <vector>
@@ -12,7 +11,7 @@
 #include <unordered_map>
 #include <fstream>
 #include <sstream>
-#include <string.h>
+#include<string.h>
 #include <random>
 
 using namespace std;
@@ -44,7 +43,6 @@ public:
     v2f transpose(v2f& A) {
         int row = A.size(), col = A[0].size();
         v2f AT(col, v1f(row, 0));
-        int row = A.size(), col = A[0].size();
         // #pragma omp parallel for
         for (int i = 0; i < row * col; i++) {
             int x = i / row, y = i % col;
@@ -185,11 +183,11 @@ public:
 
     v2f matrix_x_scalar(v2f& A, float scale) {
         int row = A.size(), col = A[0].size();
-        v2f A_scaled (row, v1f (col,0));
+        v2f A_scaled(row, v1f(col, 0));
         // #pragma omp parallel for
         for (int i = 0; i < row * col; i++) {
             int x = i / row, y = i % row;
-            A_scaled [x][y] *= A[x][y]*scale;
+            A_scaled[x][y] *= A[x][y] * scale;
         }
         return A_scaled;
     }
@@ -296,12 +294,12 @@ public:
             store["W" + to_string(l + 1)] = parameters["W" + to_string(l + 1)];
             store["Z" + to_string(l + 1)] = Z;
             v2f WL_dot_A = m.multiply_dot(parameters["W" + to_string(L)], A);
-            v2f Z = m.matrix_minus(WL_dot_A, parameters["b" + to_string(L)], "+");
+            v2f Z_update = m.matrix_minus(WL_dot_A, parameters["b" + to_string(L)], "+");
 
-            vector <vector<float>> A = m.activation_wrapper("softmax", Z);
-            store["A" + to_string(L)] = A;
+            v2f A_softmax = m.activation_wrapper("softmax", Z_update);
+            store["A" + to_string(L)] = A_softmax;
             store["W" + to_string(L)] = parameters["W" + to_string(L)];
-            store["Z" + to_string(L)] = Z;
+            store["Z" + to_string(L)] = Z_update;
         }
         return make_pair(A, store);
     }
@@ -312,14 +310,14 @@ public:
         v2f A = store["A" + to_string(L)];
         v2f B = m.transpose(Y);
         v2f dZ = m.matrix_minus(A, B, "-");
-        v2f AL1T = m.transpose (store["A" + to_string(L - 1)]);
-        v2f dW = m.multiply_dot (dZ, AL1T);
-        dW = m.matrix_x_scalar (dW, 1.0 / n);
-        v2f db = m.sums (dZ, 1);
-        v2f WLT = m.transpose (store["W" + to_string(L)]);
+        v2f AL1T = m.transpose(store["A" + to_string(L - 1)]);
+        v2f dW = m.multiply_dot(dZ, AL1T);
+        dW = m.matrix_x_scalar(dW, 1.0 / n);
+        v2f db = m.sums(dZ, 1);
+        v2f WLT = m.transpose(store["W" + to_string(L)]);
         v2f dAPrev = m.multiply_dot(WLT, dZ);
-        derivatives ["dW" + to_string(L)] = dW;
-        derivatives ["db" + to_string(L)] = db;
+        derivatives["dW" + to_string(L)] = dW;
+        derivatives["db" + to_string(L)] = db;
 
         for (int l = L - 1; l >= 0; l--) {
             v2f sig_z = m.activation_wrapper("sigmoid", store["Z" + to_string(l)]);
@@ -383,11 +381,11 @@ public:
             v1f costs;
             for (int l = 0; l < L + 1; l++) {
                 v2f dW = derivatives["dW" + to_string(l)];
-                v2f lr_dW = m.matrix_x_scalar (dW, learning_rate);
+                v2f lr_dW = m.matrix_x_scalar(dW, learning_rate);
                 parameters["W" + to_string(l)] = m.matrix_minus(parameters["W" + to_string(l)], lr_dW, "-");
 
-                v2f lr_times_dbl = m.matrix_x_scalar (derivatives["db" + to_string(l)], learning_rate); 
-                parameters["b" + to_string(l)] = m.matrix_minus (parameters["b" + to_string(l)], lr_times_dbl, "-");
+                v2f lr_times_dbl = m.matrix_x_scalar(derivatives["db" + to_string(l)], learning_rate);
+                parameters["b" + to_string(l)] = m.matrix_minus(parameters["b" + to_string(l)], lr_times_dbl, "-");
                 if (loop % 100 == 0) {
                     cout << "Cost: " << cost << endl;
                     cout << "Train Accuracy:" << accuracy(X, Y) << endl;
@@ -430,19 +428,19 @@ int main() {
     // end of inputs
 
     int n_layer = layers_dims.size();
-    neural_network* NN = &neural_network(layers_dims, n_layer);
+    neural_network NN = neural_network(layers_dims, n_layer);
 
     // normalize input data
-    NN->normalize(tr_x, scale);
-    NN->normalize(te_x, scale);
+    NN.normalize(tr_x, scale);
+    NN.normalize(te_x, scale);
 
     //encoder string vector as one-hot numerical vector
-    v2f tr_y_hot = NN->hot_vector_encoder(tr_y, labels);
-    v2f te_y_hot = NN->hot_vector_encoder(tr_y, labels);
+    v2f tr_y_hot = NN.hot_vector_encoder(tr_y, labels);
+    v2f te_y_hot = NN.hot_vector_encoder(tr_y, labels);
 
-    v1f costs = NN->fit(tr_x, tr_y_hot, learning_rate, n_iterations);
-    float tr_accuracy = NN->accuracy(tr_x, tr_y_hot);
-    float te_accuracy = NN->accuracy(te_x, te_y_hot);
+    v1f costs = NN.fit(tr_x, tr_y_hot, learning_rate, n_iterations);
+    float tr_accuracy = NN.accuracy(tr_x, tr_y_hot);
+    float te_accuracy = NN.accuracy(te_x, te_y_hot);
     cout << "Train accuracy = " << tr_accuracy;
-    cout << "Ten accuracy = " << tr_accuracy;
+    cout << "Test accuracy = " << te_accuracy;//
 }
