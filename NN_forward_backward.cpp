@@ -262,7 +262,7 @@ class neural_network {
     math_operations m = math_operations();
 
 public:
-    neural_network(vector<int> layers_dims, int n_) {
+    neural_network(vector<int> & layers_dims, int n_) {
         vector <int> layers_size = layers_dims;
         L = layers_size.size();
         n = n_;
@@ -304,7 +304,7 @@ public:
         return make_pair(A, store);
     }
 
-    unordered_map <string, v2f> backward(v2f X, v2f Y, unordered_map <string, v2f> store) {
+    unordered_map <string, v2f> backward(v2f& X, v2f& Y, unordered_map <string, v2f>& store) {
         unordered_map <string, v2f> derivatives;
         store["A0"] = m.transpose(X);
         v2f A = store["A" + to_string(L)];
@@ -338,7 +338,7 @@ public:
         }
     }
 
-    v2f hot_vector_encoder(vector <string> y, vector<string> labels) {
+    v2f hot_vector_encoder(vector <string>& y, vector<string>& labels) {
         int n = y.size();
         int n_class = labels.size();
         v2f y_hot = v2f(n, v1f(n_class, 0));
@@ -353,12 +353,12 @@ public:
         return y_hot;
     }
 
-    void normalize(v2f X, float scale) {
+    void normalize(v2f& X, float scale) {
         m.matrix_x_scalar(X, scale);
     }
 
 
-    v1f fit(v2f X, v2f Y, float learning_rate, int n_iterations) {
+    v1f fit(v2f& X, v2f& Y, float learning_rate, int n_iterations) {
         std::random_device r;
         default_random_engine eng{ r() };
         uniform_real_distribution<double> urd(0, 1);
@@ -397,7 +397,7 @@ public:
         return costs;
     }
 
-    float accuracy(v2f X, v2f Y_hot) {
+    float accuracy(v2f& X, v2f& Y_hot) {
         tuple <v2f, unordered_map <string, v2f>> A_cache = forward(X);
         v2f A = get<0>(A_cache);
         unordered_map <string, v2f> cache = get<1>(A_cache);
@@ -420,7 +420,7 @@ int main() {
     vector<string> tr_y;
     v2f te_x;
     vector<string> te_y;
-    float scale = 1.0 / 255;
+    float scale = 1.0/255.0;
     vector<int> layers_dims = { 1, 25, 3 }; //the 1st value is the input data channel
     vector<string> labels = { "dog", "cat", "snake" };
     float learning_rate = 0.01;
@@ -428,7 +428,7 @@ int main() {
     // end of inputs
 
     int n_layer = layers_dims.size();
-    neural_network NN = neural_network(layers_dims, n_layer);
+    neural_network NN = neural_network (layers_dims, n_layer);
 
     // normalize input data
     NN.normalize(tr_x, scale);
