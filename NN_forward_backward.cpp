@@ -123,7 +123,7 @@ public:
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
                 for (int k = 0; k < col2; j++) {
-                    AB[i][j] += A[i][j] * B[i][j];
+                    AB[i][j] += A[i][j] * B[j][k];
                 }
                 return AB;
             }
