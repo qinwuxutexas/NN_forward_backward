@@ -1,4 +1,4 @@
-// An (aritificial, or deep) neural network with forward and backward computations, in C++
+// A (deep) neural network with forward and backward computations, in C++
 // Q. Xu,  Date: December 18, 2022
 
 // Notes:
