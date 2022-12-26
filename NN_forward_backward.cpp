@@ -3,7 +3,7 @@
 
 // Notes:
 // 1) this is a quick prototype version 0.0.
-// 2) low level calculation is used witout using library, and thus high performance computing methods are warrnted per users' facility, e.g., for cpus with Open MP (examples provided) or message passing.
+// 2) low level calculation is used witout using library to demonstrate the procedures.
 
 #include <iostream>
 #include <vector>
