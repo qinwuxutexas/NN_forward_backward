@@ -1,9 +1,10 @@
 // An (aritificial, or deep) neural network with forward and backward computations, in C++
 // Q. Xu,  Date: December 18, 2022
+// v 0.0
 
 // Notes:
 // 1) this is a quick prototype version 0.0.
-// 2) low level calculation is used witout using library, and thus high performance computing methods are warrnted per users' facility, e.g., for cpus with Open MP (examples provided) or message passing.
+// 2) low level calculation (e.g., loops) is used witout using HPC method or libraries.
 
 #include <iostream>
 #include <vector>
@@ -11,7 +12,7 @@
 #include <unordered_map>
 #include <fstream>
 #include <sstream>
-#include<string.h>
+#include <string.h>
 #include <random>
 
 using namespace std;
