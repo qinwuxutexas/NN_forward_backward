@@ -3,4 +3,4 @@
 An (deep) neural network forward and backward computations
 
 Notes:
-low level calculation is used witout using library, just to demonstrate the procedure in details using C++.
+OpenMP is used for the (nested) loop(s) as designed for CPUs
