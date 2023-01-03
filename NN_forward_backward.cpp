@@ -53,6 +53,7 @@ public:
 
     void log_scale_matrix(v2f& A) {
         int row = A.size(), col = A[0].size();
+        #pragma omp parallel for
         for (int i = 0; i < row * col; i++) {
             int x = i / row, y = i % row;
             A[x][y] = log(A[x][y]);
@@ -62,6 +63,7 @@ public:
     vector<int> argmax_matrix_cross_row(v2f A) {
         int row = A.size(), col = A[0].size();
         vector<int> index_row_max(row, 0);
+        #pragma omp parallel for collapse(2)
         for (int i = 0; i < row; i++) {
             float max_val = -1e-8;
             int index = 0;
@@ -82,7 +84,7 @@ public:
         int row = A.size(), col = A[0].size();
         v2f AT(row, v1f(col, 0));
 
-        // #pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 0; i < row * col; i++) {
             int x = i / row, y = i % col;
             AT[x][y] = A[x][y] + operation * B[x][y];
@@ -93,7 +95,7 @@ public:
     pair <float*, float> multiply_element_wise(float* A, float* B, const int row, const int col) {
         float* AB = new float[row * col];
         float val = 0;
-        // #pragma omp parallel for
+        #pragma omp parallel for collapse(2)
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
                 *(AB + i * row + j) = (*(A + i * row + j)) * (*(B + i * row + j));
@@ -105,6 +107,7 @@ public:
 
     float* multiply_dot(float* A, float* B, const int row, const int col, const int col2) {
         float* AT = new float[row * col2]{};
+        #pragma omp parallel for collapse(3)
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
                 for (int k = 0; k < col2; j++) {
@@ -118,6 +121,7 @@ public:
     v2f multiply_dot(v2f& A, v2f& B) {
         int row = A.size(), col = A[0].size(), col2 = B[0].size();
         v2f AB;
+        #pragma omp parallel for collapse(3)
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
                 for (int k = 0; k < col2; j++) {
@@ -131,7 +135,7 @@ public:
     float sums(v2f& A) {
         int row = A.size(), col = A[0].size();
         float value = 0;
-        // #pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 0; i < row * col; i++) {
             int x = i / row, y = i % col;
             value += A[x][y];
@@ -143,7 +147,8 @@ public:
         int row = A.size(), col = A[0].size();
         int size1 = axis > 0 ? row : col;
         v2f AT(size1, v1f(1, 0));
-
+        
+        #pragma omp parallel for
         if (axis == 1) { //operate across column
             for (int i = 0; i < row; i++) {
                 float val = 0;
@@ -173,7 +178,7 @@ public:
     float mean(v2f& A) {
         int row = A.size(), col = A[0].size();
         float value = 0;
-        // #pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 0; i < row * col; i++) {
             int x = i / row, y = i % row;
             value += A[x][y];
@@ -184,7 +189,7 @@ public:
     v2f matrix_x_scalar(v2f& A, float scale) {
         int row = A.size(), col = A[0].size();
         v2f A_scaled(row, v1f(col, 0));
-        // #pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 0; i < row * col; i++) {
             int x = i / row, y = i % row;
             A_scaled[x][y] *= A[x][y] * scale;
@@ -194,7 +199,7 @@ public:
 
     void matrix_minus_scalar(v2f& A, float val, string sign) {
         int row = A.size(), col = A[0].size();
-        // #pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 0; i < row * col; i++) {
             int x = i / row, y = i % row;
             if (sign == "+")
@@ -206,7 +211,7 @@ public:
 
 private:
     void sigmoid(v2f& Z, int row, int col, v2f& A) {
-        // #pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 0; i < row * col; i++) {
             int x = i / row, y = i % row;
             A[x][y] = 1 / (1 + exp(-Z[x][y]));
@@ -216,7 +221,7 @@ private:
     void softmax(v2f& Z, int row, int col, v2f& A) {
         float sum_value = 0;
         float max_val = max(Z, row, col);
-        // #pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 0; i < row; i++) {
             int x = i / row, y = i % row;
             A[x][y] = exp(Z[x][y] - max_val);
@@ -226,7 +231,7 @@ private:
     }
 
     void relu(v2f& Z, int row, int col, v2f& A) {
-        // #pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 0; i < row * col; i++) {
             int x = i / row, y = i % row;
             A[x][y] = Z[x][y] > 0 ? Z[x][y] : 0;
@@ -235,7 +240,7 @@ private:
 
     float max(v2f& Z, int row, int col) {
         float max_val = 0;
-        // #pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 0; i < row * col; i++) {
             int x = i / row, y = i % row;
             if (Z[x][y] > max_val)
@@ -245,7 +250,7 @@ private:
     }
 
     void sigmoid_derivative(v2f& Z, int row, int col, v2f& A) {
-        // #pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 0; i < row * col; i++) {
             int x = i / row, y = i % row;
             A[x][y] = 1 / (1 + exp(-Z[x][y]));
@@ -272,6 +277,7 @@ public:
     void initialize_parameters() {
         unsigned int time_ui = unsigned int(time(NULL));
         srand(time_ui);
+        #pragma omp parallel for
         for (int l = 0; l < L; l++) {
             //initilization, as zero
             v2f A(layers_size[l], v1f(layers_size[l - 1], 0));
@@ -283,7 +289,8 @@ public:
 
     pair <v2f, unordered_map <string, v2f>> forward(v2f& X) {
         unordered_map <string, v2f> store;
-        v2f A = m.transpose(X); //X.T
+        v2f A = m.transpose(X);
+        #pragma omp parallel for
         for (int l = 0; l < L - 1; l++) {
             int row = parameters["W" + std::to_string(l + 1)].size();
             int col = A.size(), col2 = A[0].size();
@@ -318,7 +325,8 @@ public:
         v2f dAPrev = m.multiply_dot(WLT, dZ);
         derivatives["dW" + to_string(L)] = dW;
         derivatives["db" + to_string(L)] = db;
-
+        
+        #pragma omp parallel for
         for (int l = L - 1; l >= 0; l--) {
             v2f sig_z = m.activation_wrapper("sigmoid", store["Z" + to_string(l)]);
             v2f dZ = m.multiply_dot(dAPrev, sig_z);
@@ -342,7 +350,7 @@ public:
         int n = y.size();
         int n_class = labels.size();
         v2f y_hot = v2f(n, v1f(n_class, 0));
-
+        #pragma omp parallel for collapse(2)
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n_class; ++j) {
                 if (y[i] == labels[j]) {
@@ -365,7 +373,8 @@ public:
 
         int n = X.size();
         initialize_parameters();
-
+        
+        #pragma omp parallel for collapse(2)
         for (int loop = 0; loop < n_iterations; loop++) {
             tuple <v2f, unordered_map <string, v2f>> A_store = forward(X);
             v2f A = get<0>(A_store);
@@ -405,6 +414,7 @@ public:
         vector<int> y_truth = m.argmax_matrix_cross_row(Y_hot);
         int n = y_predict.size();
         float sum_val = 0;
+        #pragma omp parallel for
         for (int i = 0; i < n; i++) {
             if (y_predict[i] = y_truth[i]) {
                 sum_val += 1;
