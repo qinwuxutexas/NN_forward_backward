@@ -1,9 +1,12 @@
-// A (deep) neural network with forward and backward computations, in C++
-// Q. Xu,  Date: December 18, 2022
+/* A (deep) neural network with forward and backward computations, in C++
 
-// Notes:
-// 1) this is a quick prototype version 0.0.
-// 2) low level calculation is used witout using library to demonstrate the procedures.
+Qinwu Xu,  Date: December 18, 2022
+Methodoogy refered to Andrew NG. - "Deep Learning Specilization" at Coursera: 
+
+Notes:
+1) this is a quick prototype version 0.0.
+2) low level calculation is used, OpenMP for (nested) loops are provided for CPUs.
+*/
 
 #include <iostream>
 #include <vector>
