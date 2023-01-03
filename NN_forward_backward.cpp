@@ -16,6 +16,7 @@ Notes:
 #include <sstream>
 #include<string.h>
 #include <random>
+#include <omp.h>
 
 using namespace std;
 typedef vector<vector<float>> v2f;
