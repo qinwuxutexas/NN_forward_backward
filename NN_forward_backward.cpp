@@ -64,7 +64,7 @@ public:
         }
     }
 
-    vector<int> argmax_matrix_cross_row(v2f A) {
+    vector<int> argmax_matrix_cross_row(v2f & A) {
         int row = A.size(), col = A[0].size();
         vector<int> index_row_max(row, 0);
         #pragma omp parallel for collapse(2)
