@@ -82,7 +82,6 @@ public:
         return index_row_max;
     }
 
-
     v2f matrix_minus(v2f& A, v2f& B, string sign) {
         float operation = (sign == "+" ? 1 : -1);
         int row = A.size(), col = A[0].size();
@@ -265,7 +264,6 @@ private:
 class neural_network {
     vector <int> layers_size; // e.g, [3, 25, 10]
     int L; //layer number
-    vector <float> costs;
     int n;
     unordered_map <string, v2f> parameters;
     math_operations m = math_operations();
@@ -275,7 +273,6 @@ public:
         vector <int> layers_size = layers_dims;
         L = layers_size.size();
         n = n_;
-        v1f costs;
     }
 
     void initialize_parameters() {
