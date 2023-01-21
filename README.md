@@ -8,4 +8,5 @@ OpenMP is used for the (nested) loop(s) as designed for CPUs
 ![image](https://user-images.githubusercontent.com/78186650/212775054-d4375320-956d-480c-a883-82dad74d68e5.png)
 
 ![image](https://user-images.githubusercontent.com/78186650/213872070-102cc851-0576-4c3e-a9db-8ecf7e0cf2ea.png)
+![image](https://user-images.githubusercontent.com/78186650/213878715-bcb00db3-9e4a-43a1-993d-764363696345.png)
 
